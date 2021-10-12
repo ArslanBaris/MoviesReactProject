@@ -21,6 +21,7 @@ const MovieList = (props) => {
                   <button
                     type="button"
                     className="btn btn-md btn-outline-danger"
+                    onClick={(event)=> props.deleteMovieProp(movie)}
                   >Delete</button>
                   <h2>
                     <span className="badge badge-info">{movie.rating}</span>
