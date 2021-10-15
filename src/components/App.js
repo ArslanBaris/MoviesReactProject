@@ -3,41 +3,32 @@ import MovieList from './MovieList'
 import SearchBar from "./SearchBar";
 import axios from 'axios';
 
+import {
+  SEARCH_BASE_URL,
+  POPULAR_BASE_URL,
+  LIST_BASE_URL,
+  API_URL,
+  API_KEY,
+} from '../config';
+
 class App extends React.Component {
 
     state = {
       movies : [],
       searchQuery :""
-
     }
 
-    // Fetch
-    // async componentDidMount(){
-    //   const baseURL = "http://localhost:3002/movies";
-    //   const response = await fetch(baseURL);
-    //   const data = await response.json();
-    //   this.setState({movies : data})
-    // }
+    async componentDidMount(){      
+     
+      // Popolar Movie 
+      //const response = await axios.get(`${POPULAR_BASE_URL}&page=1`);
+      //console.log(response.data.results)
+      //this.setState({movies:response.data.results})
 
-    // deleteMovie =  async (movie) => {
-    //   const baseURL = `http://localhost:3002/movies/${movie.id}`;
-    //   await fetch(baseURL, {
-    //     method : "DELETE"
-    //   })
-    //   const newMovieList = this.state.movies.filter(
-    //     m => m.id !== movie.id
-    //   )    
-    //   this.setState(state => ({
-    //     movies:newMovieList
-    //   }))
-
-    // }
-
-    // Axios
-
-    async componentDidMount(){
-      const response = await axios.get("http://localhost:3002/movies");
-      this.setState({movies:response.data})
+      // Movie List
+      const response = await axios.get(`${LIST_BASE_URL}`);
+      console.log(response.data.items)
+      this.setState({movies:response.data.items})
     }
 
     deleteMovie = async (movie) => {
@@ -60,7 +51,7 @@ class App extends React.Component {
 
     let filteredMovie = this.state.movies.filter(
       (movie) => {
-        return movie.name.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) !== -1
+        return movie.title.toLowerCase().indexOf(this.state.searchQuery.toLowerCase()) !== -1
       }
     )
     return (
