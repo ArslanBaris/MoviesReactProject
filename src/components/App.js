@@ -3,6 +3,7 @@ import MovieList from "./MovieList";
 import SearchBar from "./SearchBar";
 import axios from "axios";
 import AddMovie from "./AddMovie";
+import EditMovie from "./EditMovie";
 import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 
 class App extends React.Component {
@@ -35,7 +36,11 @@ class App extends React.Component {
 
   // Axios
 
-  async componentDidMount() {
+  componentDidMount() {
+    this.getMovies();
+  }
+
+  async getMovies() {
     const response = await axios.get("http://localhost:3002/movies");
     this.setState({ movies: response.data });
   }
@@ -49,27 +54,38 @@ class App extends React.Component {
     }));
   };
 
-   // Search Movie
+  // Search Movie
   searchMovie = (event) => {
     this.setState({ searchQuery: event.target.value });
   };
 
   // Add Movie
-  addMovie = async (movie)  => {
-    await axios.post(`http://localhost:3002/movies`,movie)
-    this.setState( state => ({
-      movies: state.movies.concat([movie])
-    }))
-  }
+  addMovie = async (movie) => {
+    await axios.post(`http://localhost:3002/movies/`, movie);
+    this.setState((state) => ({
+      movies: state.movies.concat([movie]),
+    }));
+    this.getMovies();
+  };
+
+    // Edit Movie
+    editMovie = async (id, movie) => {
+      await axios.put(`http://localhost:3002/movies/${id}`, movie);
+      this.getMovies();
+    };
 
   render() {
-    let filteredMovie = this.state.movies.filter((movie) => {
-      return (
-        movie.name
-          .toLowerCase()
-          .indexOf(this.state.searchQuery.toLowerCase()) !== -1
-      );
-    });
+    let filteredMovie = this.state.movies
+      .filter((movie) => {
+        return (
+          movie.name
+            .toLowerCase()
+            .indexOf(this.state.searchQuery.toLowerCase()) !== -1
+        );
+      })
+      .sort((a, b) => {
+        return a.id < b.id ? 1 : a.id > b.id ? -1 : 0;
+      });
     return (
       <Router>
         <div className="container">
@@ -90,19 +106,34 @@ class App extends React.Component {
                     deleteMovieProp={this.deleteMovie}
                   />
                 </React.Fragment>
-              )}>                
-              </Route>
+              )}
+            ></Route>
 
-              <Route
+            <Route
               path="/add"
               exact
-              render={({history}) =>(
+              render={({ history }) => (
                 <AddMovie
-                  onAddMovie = {(movie) => {this.addMovie(movie)
-                  history.push("/")}}
-                 />
-              )}>                
-              </Route>
+                  onAddMovie={(movie) => {
+                    this.addMovie(movie);
+                    history.push("/");
+                  }}
+                />
+              )}
+            ></Route>
+
+            <Route
+              path="/edit/:id"
+              exact
+              render={(props) => (
+                <EditMovie
+                {...props}
+                  onEditMovie={(id, movie) => {
+                    this.editMovie(id, movie);
+                  }}
+                />
+              )}
+            ></Route>
           </Switch>
         </div>
       </Router>
