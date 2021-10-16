@@ -40,6 +40,7 @@ class App extends React.Component {
     this.setState({ movies: response.data });
   }
 
+  // Delete Movie
   deleteMovie = async (movie) => {
     axios.delete(`http://localhost:3002/movies/${movie.id}`);
     const newMovieList = this.state.movies.filter((m) => m.id !== movie.id);
@@ -48,9 +49,18 @@ class App extends React.Component {
     }));
   };
 
+   // Search Movie
   searchMovie = (event) => {
     this.setState({ searchQuery: event.target.value });
   };
+
+  // Add Movie
+  addMovie = async (movie)  => {
+    await axios.post(`http://localhost:3002/movies`,movie)
+    this.setState( state => ({
+      movies: state.movies.concat([movie])
+    }))
+  }
 
   render() {
     let filteredMovie = this.state.movies.filter((movie) => {
@@ -83,7 +93,16 @@ class App extends React.Component {
               )}>                
               </Route>
 
-            <Route path="/add" component={AddMovie} />
+              <Route
+              path="/add"
+              exact
+              render={({history}) =>(
+                <AddMovie
+                  onAddMovie = {(movie) => {this.addMovie(movie)
+                  history.push("/")}}
+                 />
+              )}>                
+              </Route>
           </Switch>
         </div>
       </Router>
